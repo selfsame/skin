@@ -7,7 +7,7 @@
                  [org.clojure/clojurescript "1.9.946"]
                  [reagent "0.7.0"]]
   :min-lein-version "2.5.3"
-  :source-paths ["src"]
+  :source-paths ["src" "test"]
   :plugins [[lein-cljsbuild "1.1.4"]]
   :clean-targets ^{:protect false} ["resources/public/js"
                                     "target"]
@@ -19,7 +19,7 @@
   :cljsbuild
   {:builds
    [{:id           "dev"
-     :source-paths ["src"]
+     :source-paths ["src" "test"]
      :figwheel     {:on-jsload "skin.core/reload"}
      :compiler     {:main                 skin.core
                     :optimizations        :none
@@ -36,4 +36,7 @@
                     :output-dir      "resources/public/js/min"
                     :elide-asserts   true
                     :closure-defines {goog.DEBUG false}
-                    :pretty-print    false}}]})
+                    :pretty-print    false}}]}
+  :deploy-repositories [
+  ["clojars" {
+    :sign-releases false}]])

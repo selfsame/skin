@@ -3,24 +3,18 @@
 
 (defn- datatype? [v] (or (sequential? v) (set? v) (map? v)))
 
-(defn- css-value [v]
-  (cond (symbol? v) v
-        (list? v) v
-        (keyword? v) (apply str (rest (str v)))
-        (number? v)  (str v)
-        (vector? v) `(~'str ~@(interpose " " (map css-value v)))
-        :else (str v)))
-
-(defn- clj->css [col]
-  (into {} (map  
-    (fn [[k v]]
-      [k (css-value v)])
-    col)))
+(defn- rulestring [v] 
+  (cond 
+    (keyword? v) (name v) 
+    (vector? v) (apply str (interpose " " (map rulestring v)))
+    :else (str v)))
 
 (defn- find-blocks [form]
-  (map #(list 'skin.core/render-block 
-          (apply str (interpose ", " (first %))) 
-          (clj->css (first (last %))))
+  (map 
+    (fn [[rule styles]]
+      (list 'skin.core/render-block 
+          (apply str (interpose ", " (map rulestring rule)))
+          (first styles)))
     (partition 2 (partition-by map? form))))
 
 (defn- block-walk [form]
@@ -35,5 +29,5 @@
    `(~'skin.core/register ~kw
       (~'fn [] 
         [:style {
-          :id ~(apply str (rest (str kw)))
+          :id ~(str kw)
           :dangerouslySetInnerHTML {:__html (~'str ~@blocks)}} ]))))
